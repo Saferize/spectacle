@@ -25,13 +25,19 @@ function propertyArrayDefinition(ref) {
   return parts.length > 2 && parts.lastIndexOf("items") === parts.length - 2;
 }
 
+function requestBodyDefinition(ref) {
+  var parts = ref.split("/")
+  return parts.length > 4 && parts.indexOf("schema") === parts.length - 2 &&
+    parts.indexOf("requestBody") === parts.length - 6;  
+}
+
 /**
  * Recognizes different types of definitions that could be moved to the global 'definitions'.
  * @param {String} ref the JSON reference
  * @return {Boolean} `true` if the current path is an OpenAPI `definition`.
 */
 function definition(ref) {
-  return responseSchemaDefinition(ref) || propertyArrayDefinition(ref)
+  return responseSchemaDefinition(ref) || propertyArrayDefinition(ref) || requestBodyDefinition(ref);
 }
 
 /**
@@ -41,6 +47,7 @@ function definition(ref) {
 */
 function path(ref) {
   var parts = ref.split("/")
+  if (ref == "paths/") return true;
   return parts.length === 3 && parts.lastIndexOf("paths") === parts.length - 3 && parts[1].length > 0;
 }
 

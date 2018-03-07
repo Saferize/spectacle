@@ -153,8 +153,11 @@ var common = {
   	}
     else if (ref.type) {
   	  return ref.type + (ref.format ? ' (' + ref.format + ')' : '')
-  	}
-
+    }
+    else if (ref.enum) {
+      return ref.enum.join(", ");
+    }
+    
     console.error('Cannot format property ', ref)
   },
 

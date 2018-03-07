@@ -100,12 +100,13 @@ function replaceReference(cwd, top, obj, context) {
   if(typeof referenced === "object") {
     resolveLocal(referenced, referenced, "#/")
     referenced["x-external"] = external;
-    module.exports.replaceRefs(path.dirname(ref), top, referenced, context)
+   // module.exports.replaceRefs(path.dirname(ref), top, referenced, context)
   }
   if(contexts.definition(context)) {
     if(!top.definitions) { top.definitions = {}; }
-    if(!top.definitions[external]) { top.definitions[external] = referenced; }
-    Object.assign(obj, { "$ref": "#/definitions/"+external.replace("/", "%2F") })
+    var externalName = external.replace(/.*#(\w*)/g, "$1");
+    if(!top.definitions[externalName]) { top.definitions[externalName] = referenced; }
+    Object.assign(obj, { "$ref": "#/definitions/" + externalName })
   }
   else if(contexts.path(context)) {
     Object.keys(referenced).forEach(function(method) {

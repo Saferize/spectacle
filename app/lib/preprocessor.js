@@ -22,6 +22,18 @@ module.exports = function(options, specData) {
     copy.logo = path.basename(options.logoFile)
   }
 
+  copy = JSON.parse(JSON.stringify(copy).replace(/#\/components\/schemas/g, "#/definitions"));
+
+  if (copy.components && copy.components.schemas) {    
+    var definitions = {};
+    Object.keys(copy.components.schemas).forEach(function(component) {
+      definitions[component] = copy.components.schemas[component]; 
+      
+    });
+    copy.definitions = definitions;  
+  }
+
+
   // The "body"-parameter in each operation is stored in a
   // separate field "_request_body".
   if (copy.paths) {
@@ -46,14 +58,25 @@ module.exports = function(options, specData) {
               name: tag,
               operations: []
             }
-            tagsByName[tag] = tagDefinition
-            copy.tags.push(tagDefinition)
+            tagsByName[tag] = tagDefinition;
+            copy.tags.push(tagDefinition);
           }
           if (tagsByName[tag]) {
-            tagsByName[tag].operations = tagsByName[tag].operations || []
-            tagsByName[tag].operations.push(operation)
+            var tag = copy.tags.find(x=> x.name == tag);
+            tag.operations = tag.operations || [];
+            tag.operations.push(operation);
+            // tagsByName[tag].operations = tagsByName[tag].operations || [];
+            // tagsByName[tag].operations.push(operation);
           }
-        })
+        })               
+        if (operation.requestBody) {
+          var p = operation.requestBody;
+          p.in = "body";
+          p.name = "body";
+          p.schema = operation.requestBody.content["application/json"].schema;
+          operation.parameters = (operation.parameters || []);
+          operation.parameters.push(p);          
+        }
         // Join parameters with path-parameters
         operation.parameters = (operation.parameters || [])
           .concat(pathParameters)
@@ -73,7 +96,9 @@ module.exports = function(options, specData) {
   }
 
   var replaceRefs = require("./resolve-references").replaceRefs;
-  replaceRefs(path.dirname(copy["x-spec-path"]), copy, copy, "")
+  replaceRefs(path.dirname(copy["x-spec-path"]), copy, copy, "");
+
+
 
   return copy;
 }
