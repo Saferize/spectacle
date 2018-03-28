@@ -62,6 +62,7 @@ function fetchReference(ref) {
       src = request("GET", file).body;
     }
     else {
+      // fs module can handle posix file separator on Windows
       src = fs.readFileSync(file, "utf8")
     }
     if(file.indexOf(".yml") > -1 || file.indexOf(".yaml") > -1) {
@@ -78,7 +79,7 @@ function fetchReference(ref) {
   }
 
   if(src.$ref && typeof src.$ref === "string" && !localReference(src.$ref)) {
-    src = fetchReference(pathUtils.join(path.dirname(ref), src.$ref))
+    src = fetchReference(pathUtils.join(path.posix.dirname(ref), src.$ref))
   }
 
   return src;
@@ -95,18 +96,18 @@ function fetchReference(ref) {
 */
 function replaceReference(cwd, top, obj, context) {
   var ref = pathUtils.join(cwd, obj.$ref)
-  var external = pathUtils.relative(path.dirname(top["x-spec-path"]), ref)
+  var external = pathUtils.relative(path.posix.dirname(top["x-spec-path"]), ref)
   var referenced = module.exports.fetchReference(ref)
   if(typeof referenced === "object") {
     resolveLocal(referenced, referenced, "#/")
     referenced["x-external"] = external;
-   // module.exports.replaceRefs(path.dirname(ref), top, referenced, context)
+    module.exports.replaceRefs(path.posix.dirname(ref), top, referenced, context)
   }
   if(contexts.definition(context)) {
     if(!top.definitions) { top.definitions = {}; }
-    var externalName = external.replace(/.*#(\w*)/g, "$1");
-    if(!top.definitions[externalName]) { top.definitions[externalName] = referenced; }
-    Object.assign(obj, { "$ref": "#/definitions/" + externalName })
+    if(!top.definitions[external]) { top.definitions[external] = referenced; }
+    // Object.assign(obj, { "$ref": "#/definitions/"+external.replace("/", "%2F") })
+    Object.assign(obj, { "$ref": external })
   }
   else if(contexts.path(context)) {
     Object.keys(referenced).forEach(function(method) {
@@ -165,7 +166,7 @@ function replaceRefs(cwd, top, obj, context) {
 
   for(var k in obj) {
     var val = obj[k];
-    if(typeof val !== "object" || !val) { continue; }
+    if(typeof val !== "object" || val === null) { continue; }
 
     if(val.$ref) {
 

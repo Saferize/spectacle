@@ -238,6 +238,7 @@ describe("resolve-references.js", function() {
         top.paths = {
           "/": { "$ref": "fixtures/basic-path.yaml" },
         };
+        top["x-spec-path"] = cwd + "/test.json";
         res.replaceReference(cwd, top, top.paths["/"], "paths/%2F/");
         top.should.have.property("tags");
         top.tags.should.be.an.array;
@@ -295,6 +296,25 @@ describe("resolve-references.js", function() {
         res.replaceRefs(cwd, top, top, "");
         top.should.have.property("definitions");
         top.definitions.should.have.property("fixtures/User.yml");
+      });
+
+      it("should not error on null ref", function() {
+
+        top = Object.create(minimal);
+        top["x-spec-path"] = cwd + "/test.json";
+        top.paths = { "/": { get: {
+          description: "",
+          responses: { "200": {
+            description: "",
+            schema: {
+              "$ref": "fixtures/NullExample.yml"
+            }
+          }
+          }}}};
+
+        res.replaceRefs(cwd, top, top, "");
+        top.should.have.property("definitions");
+        top.definitions.should.have.property("fixtures/NullExample.yml");
       });
 
     });

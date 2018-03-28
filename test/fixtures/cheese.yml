@@ -1,9 +1,9 @@
 swagger: '2.0'
 info:
   description: |
-    Welcome to the sample Cheese Store API reference. This is a live example of how you can use [Spectacle](http://sourcey.com/spectacle) in conjunction with [Swagger](http://swagger.io) to generate beautiful static documentation for your own APIs.
+    Welcome to the sample Cheese Store API reference. This is a live example of how you can use [Spectacle](https://sourcey.com/spectacle) in conjunction with [Swagger](https://swagger.io) to generate beautiful static documentation for your own APIs.
 
-    The Cheese Store API is organized around the [REST](http://en.wikipedia.org/wiki/Representational_State_Transfer) mothodology, and it uses resource-oriented URLs, and common HTTP response codes to indicate API errors. All requests are authenticated using an `api-key` which can be obtained from your developer dashboard. And now, more cheese...
+    The Cheese Store API is organized around the [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) methodology, and it uses resource-oriented URLs, and common HTTP response codes to indicate API errors. All requests are authenticated using an `api-key` which can be obtained from your developer dashboard. And now, more cheese...
 
     Hard cheese gouda say cheese. Ricotta cauliflower cheese cheesecake bocconcini edam bocconcini fromage feta. Who moved my cheese bocconcini cheese and wine cottage cheese cheese on toast who moved my cheese caerphilly stinking bishop. Bocconcini cheesy feet the big cheese macaroni cheese cheesy feet mascarpone.
   version: 1.0.0
@@ -103,7 +103,7 @@ paths:
       tags:
         - Cheese
       summary: Finds cheeses by tags
-      description: 'Muliple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.'
+      description: 'Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.'
       operationId: findCheesesByTags
       produces:
         - application/xml
@@ -138,7 +138,7 @@ paths:
       tags:
         - Cheese
       summary: Find cheese by ID
-      description: Return a specific cheese by it's ID.
+      description: Return a specific cheese by its ID.
       operationId: getCheeseById
       produces:
         - application/xml
@@ -583,6 +583,7 @@ securityDefinitions:
   cheesy_auth:
     type: oauth2
     authorizationUrl: 'http://cheesy.sourcey.com/api/oauth/dialog'
+    description: Provides OAuth access to the cheese
     flow: implicit
     scopes:
       'write:cheeses': Modify cheeses in your account
@@ -590,6 +591,7 @@ securityDefinitions:
   api_key:
     type: apiKey
     name: api_key
+    description: Provides API Key access to the cheese
     in: header
 definitions:
   Order:
@@ -744,7 +746,7 @@ definitions:
           name: tag
           wrapped: true
         items:
-          $ref: 'tag.yml#/Tag/'
+          $ref: 'tag.yml#/Tag'
       status:
         type: string
         description: Cheese status in the store
