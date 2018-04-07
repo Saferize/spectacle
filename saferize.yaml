@@ -39,16 +39,6 @@ tags:
         * UsageTimerTimeIsUpEvent
         * UsageTimerPausedEvent
         * UsageTimerUnPausedEvent
-
-DASDASDAS:
-   BearerAuth:
-     type: http
-     scheme: bearer
-     in: header
-     name: Authorization
-     scopes:
-      read: Grants read access
-      write: Grants write access
 securityDefinitions:
    BearerAuth:
      type: http
@@ -1079,6 +1069,41 @@ paths:
         # On error:
         #   description: Please refer to the `Error` object for the list of possible errors
         #   $ref: '#/definitions/Error' 
+      # Operation-specific security:
+      security:
+        - BearerAuth: [read, write]
+      tags:
+       - App
+      operationId: setParentalAppFeatures
+      summary: Set parental features
+      description: Parental features allow parents to customize their experience with these features. It's up to developer's discretion to determine which features they wish to expose. Please [Set implemented features](/#operation--app--id--implementedFeatures-put) before setting parental features.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier for the app.
+          required: true
+          type: integer
+          format: int64
+        - name: Implemented App Features
+          in: body
+          description: An array of implemented app features
+          schema:
+            $ref: '#/definitions/AppFeature/name' 
+            example:  [CHAT, ADVERTISING]
+      responses:
+        200:
+          description: Returns an array of app feature objects. Bare in mind that the `parental` flag will be set to `false` initially.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AppFeature'
+        On error:
+          description: Please refer to the `Error` object for the list of possible errors
+          $ref: '#/definitions/Error'
 
   /session:
     post:
@@ -1086,35 +1111,37 @@ paths:
       - Session
       summary: Creates a new Session
       operationId: createSession
-      requestBody:
-        required: true
-        description: Identifies the session to be created
-        content:
-          application/json:
-            schema:
-              properties:
-                accessKey:
-                  type: string
-                  description: The accessKey or email for the user
-                secretKey:
-                  type: string
-                  description: The secretKey or password for the user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: accessKey
+          in: body
+          description: The accessKey or email for the user
+          required: true
+          type: string
+          example: this
+        - name: secretKey
+          in: body
+          description: The secretKey or password for the user
+          required: true
+          type: string
+          example: that
       responses:
-        201:
-          description: The new Session
-          content:
-            application/json:
-              schema:
-                properties:
-                  token:
-                    type: string
-                    description: The Session Token
-                  subject:
-                    type: object
-                    description: The Subject (Parent) that created this session
-                  signatureCode:
-                    type: string
-                    description: The signature to be used on subsequent calls
+        200:
+          description: The created Session
+          schema:
+            properties:
+              token:
+                type: string
+                description: The Session Token
+              subject:
+                type: object
+                description: The Subject (Parent) that created this session
+              signatureCode:
+                type: string
+                description: The signature to be used on subsequent calls
         On error:
           description: Please refer to the `Error` object for the list of possible errors
           $ref: '#/definitions/Error' 
